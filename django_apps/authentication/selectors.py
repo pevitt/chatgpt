@@ -24,3 +24,12 @@ def filter_user_by_names(
         first_name=first_name,
         last_name=last_name
     )
+
+
+def filter_profile_by_user(
+        *,
+        user: User
+) -> 'QuerySet[Profile]':
+    return Profile.objects.filter(
+        user=user
+    )

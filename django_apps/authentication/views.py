@@ -106,3 +106,67 @@ class LoginApiView(APIView):
             data=data,
             status=status.HTTP_200_OK
         )
+
+
+class ProfileApiView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    class InputSerializer(serializers.Serializer):
+        bio = serializers.CharField()
+        skills = serializers.CharField(
+            max_length=1000
+        )
+
+    class OutputSerializer(serializers.Serializer):
+        email = serializers.EmailField()
+        first_name = serializers.CharField(
+            max_length=100
+        )
+        last_name = serializers.CharField(
+            max_length=100
+        )
+        bio = serializers.CharField(
+            required=False,
+            allow_null=True
+        )
+        skills = serializers.CharField(
+            max_length=1000,
+            required=False,
+            allow_null=True
+        )
+
+    def get(self, request):
+
+        data_response = users_services.filter_profile_by_user(
+            user=request.user
+        )
+
+        output_serializer = self.OutputSerializer(data=data_response)
+        try:
+            output_serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            print(e)
+            raise ChatGptAPIException(ErrorCode.E00)
+
+        return Response(output_serializer.validated_data)
+
+    def put(self, request):
+
+        input_serializer = self.InputSerializer(data=request.data)
+        input_serializer.is_valid(raise_exception=True)
+
+        input_serializer.validated_data['user'] = request.user
+
+        data_response = users_services.update_profile_user(
+            **input_serializer.validated_data
+        )
+
+        output_serializer = self.OutputSerializer(data=data_response)
+        try:
+            output_serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            print(e)
+            raise ChatGptAPIException(ErrorCode.E00)
+
+        return Response(output_serializer.validated_data)
+
