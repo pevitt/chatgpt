@@ -8,6 +8,7 @@ from rest_framework.authtoken.models import Token
 from . import selectors as users_selectors
 from . import services as users_services
 from utils.exceptions import ChatGptAPIException, ErrorCode
+
 from .backends import EmailAuthBackend
 
 

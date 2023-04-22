@@ -5,6 +5,7 @@ from rest_framework.authtoken.models import Token
 from typing import Any, Dict
 from . import selectors as users_selectors
 from django.db.models import F
+from advmessages import services as messages_services
 
 
 def create_user(
@@ -71,6 +72,9 @@ def update_profile_user(
     profile_qry.bio = bio
     profile_qry.skills = skills
     profile_qry.save()
+
+
+    message = messages_services.create_message_system(profile_qry)
 
     profile_qry = users_selectors.filter_profile_by_user(
         user=user
